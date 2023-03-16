@@ -34,13 +34,21 @@ app.get('/order', reqMethod, (request, response) => {
 })
 
 app.post('/order', reqMethod, (request, response) => {
+try {
     const { order, clientName, price } = request.body
 
+    if (price < 10) throw new Error('Only orders starting at $10 allowed.')
+    
     const newOrder = { id: uuid.v4(), order, clientName, price, status: 'Em preparação' }
-
+    
     orders.push(newOrder)
-
+    
     return response.status(201).json(newOrder)
+} catch(err) {
+    return response.status(400).json({ error:err.message})
+} finally {
+    console.log('request finished')
+}
 })
 
 app.put('/order/:id', checkOrderId, reqMethod, (request, response) => {
